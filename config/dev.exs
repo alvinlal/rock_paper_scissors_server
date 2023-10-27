@@ -14,7 +14,9 @@ config :rock_paper_scissors, RockPaperScissorsWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "VBc7UkcJfNgeLK3kO7BGsYNGi0A7+n5nADDk6fyGoH9P1EI1OhQ2wEW/MMn14xMm",
-  watchers: []
+  watchers: [],
+  join_timeout: 5000,
+  move_timeout: 60000
 
 # ## SSL Support
 #

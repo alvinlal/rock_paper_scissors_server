@@ -12,7 +12,7 @@ defmodule RockPaperScissorsWeb.LobbyChannel do
   end
 
   def leave({session_id, game_id}) do
-    Logger.info("player #{session_id}:#{game_id} leaved player channel")
+    Logger.info("player #{session_id}:#{game_id} leaved lobby channel")
     MatchMaker.deRegisterPlayer({session_id, game_id})
   end
 end

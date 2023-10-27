@@ -5,7 +5,9 @@ import Config
 config :rock_paper_scissors, RockPaperScissorsWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "rSWeUswFvoMX/tDg/Q12JejJFItgvnygRRVrt/SXg+Gkc5j3BATvUloVJBHKwDeu",
-  server: false
+  server: false,
+  join_timeout: 100,
+  move_timeout: 200
 
 # Print only warnings and errors during test
 config :logger, level: :warning

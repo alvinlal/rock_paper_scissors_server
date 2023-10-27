@@ -9,6 +9,7 @@ defmodule RockPaperScissorsWeb.Socket do
 
   ## Channels
   channel "lobby:player:*", RockPaperScissorsWeb.LobbyChannel
+  channel "game:*", RockPaperScissorsWeb.GameChannel
   #
   # To create a channel file, use the mix task:
   #

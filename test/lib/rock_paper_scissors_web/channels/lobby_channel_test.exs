@@ -5,14 +5,14 @@
 # 4. A player should be matchmaked on the race condition that the old player_leave event reach's the matchmaker after the new player_join event reach's the matchmaker on browser refresh
 
 defmodule RockPaperScissorsWeb.LobbyChannelTest do
+  use RockPaperScissorsWeb.ChannelCase, async: true
   require Logger
   alias RockPaperScissors.MatchMaker
-  use RockPaperScissorsWeb.ChannelCase
 
   test "A player should be able to join the channel and get 'no_opponents' if there are no other players joined" do
     joinLobbyChannel(UUID.uuid4(), UUID.uuid4())
 
-    assert_push "no_players", %{}
+    assert_push "no_players", _, 200
     MatchMaker.resetState()
   end
 
@@ -39,7 +39,7 @@ defmodule RockPaperScissorsWeb.LobbyChannelTest do
 
     joinLobbyChannel(session_id, UUID.uuid4())
 
-    assert_push "no_players", %{}
+    assert_push "no_players", _
 
     joinLobbyChannel(UUID.uuid4(), UUID.uuid4())
 
@@ -52,15 +52,15 @@ defmodule RockPaperScissorsWeb.LobbyChannelTest do
     session_id = UUID.uuid4()
     game_id = UUID.uuid4()
 
-    {_, _, socketA} = joinLobbyChannel(session_id, game_id)
+    {_, _, socket} = joinLobbyChannel(session_id, game_id)
 
-    Process.unlink(socketA.channel_pid)
+    Process.unlink(socket.channel_pid)
 
     # Browser refresh's
 
     joinLobbyChannel(session_id, UUID.uuid4())
 
-    leaveLobbyChannel(socketA)
+    leaveLobbyChannel(socket)
 
     joinLobbyChannel(UUID.uuid4(), UUID.uuid4())
 
@@ -68,7 +68,7 @@ defmodule RockPaperScissorsWeb.LobbyChannelTest do
 
     joinLobbyChannel(UUID.uuid4(), UUID.uuid4())
 
-    assert_push "no_players", %{}
+    assert_push "no_players", _
 
     MatchMaker.resetState()
   end

@@ -1,5 +1,6 @@
 defmodule RockPaperScissors.MatchMaker do
   use GenServer
+  alias RockPaperScissors.Referee
   alias RockPaperScissorsWeb.Endpoint
   require Logger
 
@@ -12,9 +13,9 @@ defmodule RockPaperScissors.MatchMaker do
     GenServer.cast({:global, MatchMaker}, {:deregister_player, {session_id, game_id}})
   end
 
- # for tests only
+  # for tests only
   def resetState() do
-    GenServer.call({:global,MatchMaker},{:reset_state})
+    GenServer.call({:global, MatchMaker}, {:reset_state})
   end
 
   # Server API
@@ -52,6 +53,8 @@ defmodule RockPaperScissors.MatchMaker do
           "broadcasting got_opponent to #{waiting_player_id} and #{new_player_id} with channel id #{game_channel_id}"
         )
 
+        GenServer.start(Referee, {game_channel_id})
+
         Endpoint.broadcast("lobby:player:" <> new_player_id, "got_opponent", %{
           game_channel_id: game_channel_id
         })
@@ -83,10 +86,10 @@ defmodule RockPaperScissors.MatchMaker do
     end
   end
 
- # for tests only
+  # for tests only
   @impl true
-  def handle_call({:reset_state},_from,_state) do
-    {:reply,:ok,{nil,nil}}
+  def handle_call({:reset_state}, _from, _state) do
+    {:reply, :ok, {nil, nil}}
   end
 
   @impl true

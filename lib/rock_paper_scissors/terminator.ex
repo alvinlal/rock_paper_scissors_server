@@ -4,17 +4,17 @@ defmodule RockPaperScissors.Terminator do
 
   ## Client API
   def monitor(pid, mfa) do
-    GenServer.call({:global, Terminator}, {:monitor, pid, mfa})
+    GenServer.call(Terminator, {:monitor, pid, mfa})
   end
 
   def demonitor(pid) do
-    GenServer.call({:global, Terminator}, {:demonitor, pid})
+    GenServer.call(Terminator, {:demonitor, pid})
   end
 
   ## Server API
   def start_link(args) do
     Logger.info("started terminator")
-    GenServer.start_link(__MODULE__, args, name: {:global, Terminator})
+    GenServer.start_link(__MODULE__, args, name: Terminator)
   end
 
   @impl true

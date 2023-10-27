@@ -12,8 +12,10 @@ defmodule RockPaperScissors.Application do
       RockPaperScissorsWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: RockPaperScissors.PubSub},
+      # Start process registry
+      {Registry, keys: :unique, name: Registry.RpsRegistry},
       # Start the Presence system
-      RockPaperScissorsWeb.Presence,
+      # RockPaperScissorsWeb.Presence,
       # Start the Endpoint (http/https)
       RockPaperScissorsWeb.Endpoint,
       # Start the ChannelWatcher
