@@ -1,18 +1,16 @@
 # Requirements
-# 1. Both players should receive "game_ready" event when 2 players have joined
-# 2. A player should get 'opponent_join_timeout' event if the 2nd player haven't joined after join_timeout amount of milliseconds specified in config
-# 3. A player should get "opponent_left" event when the opponent player has left
-# 4. Player should get "game_not_found" event on rejoin after network disconnect
-# 5. Player join should be idempotent
-# 6. A player should get "game_timeout" event if the other player doesn't make a move after move_timeout amount of milliseconds specified in config
-# 7. Both players should get "game_timeout" event if none of them makes a move after move_timeout amount of milliseconds specified in config
-# 8. A player gets "opponent_made_move" event when the opponent has made a move
-# 9. Players should be able to make moves and get results correctly
+# 1. A player should get 'opponent_join_timeout' event if the 2nd player haven't joined after join_timeout amount of milliseconds specified in config
+# 2. A player should get "opponent_left" event when the opponent player has left
+# 3. Player should get "game_not_found" event on rejoin after network disconnect
+# 4. A player should get "game_timeout" event if the other player doesn't make a move after move_timeout amount of milliseconds specified in config
+# 5. Both players should get "game_timeout" event if none of them makes a move after move_timeout amount of milliseconds specified in config
+# 6. A player gets "opponent_made_move" event when the opponent has made a move
+# 7. Players should be able to make moves and get results correctly
 
 defmodule RockPaperScissorsWeb.GameChannelTest do
   use RockPaperScissorsWeb.ChannelCase, async: true
   alias RockPaperScissors.Referee
-  import ExUnit.CaptureIO
+  # import ExUnit.CaptureIO
 
   setup do
     game_channel_id = UUID.uuid4()
@@ -20,13 +18,13 @@ defmodule RockPaperScissorsWeb.GameChannelTest do
     %{game_channel_id: game_channel_id, referee_pid: pid}
   end
 
-  test "Both players should receive 'game_ready' event when 2 players have joined", %{
-    game_channel_id: game_channel_id
-  } do
-    joinGameChannel(game_channel_id, UUID.uuid4())
-    joinGameChannel(game_channel_id, UUID.uuid4())
-    assert_broadcast "game_ready", _
-  end
+  # test "Both players should receive 'game_ready' event when 2 players have joined", %{
+  #   game_channel_id: game_channel_id
+  # } do
+  #   joinGameChannel(game_channel_id, UUID.uuid4())
+  #   joinGameChannel(game_channel_id, UUID.uuid4())
+  #   assert_broadcast "game_ready", _
+  # end
 
   test "A player should get 'opponent_join_timeout' event if the 2nd player haven't joined after join_timeout amount of milliseconds specified in config",
        %{
@@ -64,16 +62,16 @@ defmodule RockPaperScissorsWeb.GameChannelTest do
     assert_broadcast "game_not_found", _
   end
 
-  test "Player join should be idempotent", %{game_channel_id: game_channel_id} do
-    player_id = UUID.uuid4()
+  # test "Player join should be idempotent", %{game_channel_id: game_channel_id} do
+  #   player_id = UUID.uuid4()
 
-    joinGameChannel(game_channel_id, player_id)
-    joinGameChannel(game_channel_id, UUID.uuid4())
-    assert_push "game_ready", _
-    capture_io(fn -> :c.flush() end)
-    joinGameChannel(game_channel_id, player_id)
-    refute_push "game_ready", _
-  end
+  #   joinGameChannel(game_channel_id, player_id)
+  #   joinGameChannel(game_channel_id, UUID.uuid4())
+  #   assert_push "game_ready", _
+  #   capture_io(fn -> :c.flush() end)
+  #   joinGameChannel(game_channel_id, player_id)
+  #   refute_push "game_ready", _
+  # end
 
   test "A player should get 'move_timeout' event if the other player doesn't make a move after move_timeout amount of milliseconds specified in config",
        %{game_channel_id: game_channel_id, referee_pid: referee_pid} do

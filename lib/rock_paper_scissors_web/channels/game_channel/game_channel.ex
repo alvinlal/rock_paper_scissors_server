@@ -1,4 +1,5 @@
 defmodule RockPaperScissorsWeb.GameChannel do
+  alias RockPaperScissors.GameChannelEvents
   alias RockPaperScissorsWeb.Endpoint
   alias RockPaperScissors.Referee
   alias RockPaperScissors.Terminator
@@ -19,7 +20,7 @@ defmodule RockPaperScissorsWeb.GameChannel do
     case length(game_process) do
       0 ->
         Logger.info("Game referee not found")
-        Endpoint.broadcast(socket.topic, "game_not_found", %{})
+        Endpoint.broadcast(socket.topic, GameChannelEvents.game_not_found(), %{})
 
       _ ->
         Logger.info("Referee found")
@@ -42,19 +43,19 @@ defmodule RockPaperScissorsWeb.GameChannel do
 
   @impl true
   def handle_info({:game_round_result, result}, socket) do
-    push(socket, "game_round_result", %{result: result})
+    push(socket, GameChannelEvents.game_round_result(), %{result: result})
     {:noreply, socket}
   end
 
   @impl true
   def handle_info({:game_match_result, result}, socket) do
-    push(socket, "game_match_result", %{result: result})
+    push(socket, GameChannelEvents.game_match_result(), %{result: result})
     {:noreply, socket}
   end
 
   @impl true
   def handle_info({:opponent_made_move}, socket) do
-    push(socket, "opponent_made_move", %{})
+    push(socket, GameChannelEvents.opponent_made_move(), %{})
     {:noreply, socket}
   end
 

@@ -1,4 +1,5 @@
 defmodule RockPaperScissors.Referee do
+  alias RockPaperScissors.GameChannelEvents
   alias RockPaperScissorsWeb.Endpoint
   use GenServer
   require Logger
@@ -83,10 +84,10 @@ defmodule RockPaperScissors.Referee do
   def handle_cast({:player_join, player_id, channel_pid}, state) do
     Logger.info("#{player_id} joined game channel #{state.game_channel_id}")
 
-    if(state.players_joined == 1) do
-      Logger.info("All players joined game channel #{state.game_channel_id}, emiting game_ready")
-      Endpoint.broadcast("game:#{state.game_channel_id}", "game_ready", %{})
-    end
+    # if(state.players_joined == 1) do
+    #   Logger.info("All players joined game channel #{state.game_channel_id}, emiting game_ready")
+    #   Endpoint.broadcast("game:#{state.game_channel_id}", GameChannelEvents.game_ready(), %{})
+    # end
 
     case state.players_joined do
       players_joined when players_joined == 0 or players_joined == 1 ->
@@ -139,8 +140,7 @@ defmodule RockPaperScissors.Referee do
         new_state =
           %{"state" => state, "winner_player_id" => winner_player_id}
           |> set_rounds_won()
-
-        # |> Map.update(:rounds_played, 0, fn value -> value + 1 end) , TODO:- remove this and state.rounds_played
+          |> Map.update(:rounds_played, 0, fn value -> value + 1 end)
 
         case has_won_series(
                new_state.players,
@@ -171,13 +171,13 @@ defmodule RockPaperScissors.Referee do
   @impl true
   def handle_cast({:player_left}, state) do
     Logger.info("A player left the game, killing referee")
-    Endpoint.broadcast("game:#{state.game_channel_id}", "opponent_left", %{})
+    Endpoint.broadcast("game:#{state.game_channel_id}", GameChannelEvents.opponent_left(), %{})
     Process.exit(self(), :normal)
   end
 
   @impl true
   def handle_info({:move_timeout}, state) do
-    Endpoint.broadcast("game:#{state.game_channel_id}", "move_timeout", %{})
+    Endpoint.broadcast("game:#{state.game_channel_id}", GameChannelEvents.move_timeout(), %{})
     Process.exit(self(), :normal)
   end
 
@@ -188,7 +188,12 @@ defmodule RockPaperScissors.Referee do
         "2nd player haven't joined yet, emiting opponent_join_timeout and killing referee"
       )
 
-      Endpoint.broadcast("game:#{state.game_channel_id}", "opponent_join_timeout", %{})
+      Endpoint.broadcast(
+        "game:#{state.game_channel_id}",
+        GameChannelEvents.opponent_join_timeout(),
+        %{}
+      )
+
       Process.exit(self(), :normal)
     end
 
@@ -208,8 +213,8 @@ defmodule RockPaperScissors.Referee do
 
   defp has_won_series(players, player_id_a, player_id_b) do
     case {players[player_id_a].rounds_won, players[player_id_b].rounds_won} do
-      {a, b} when a == 3 -> {true, a, b}
-      {a, b} when b == 3 -> {true, b, a}
+      {a, _b} when a == 3 -> {true, player_id_a, player_id_b}
+      {_a, b} when b == 3 -> {true, player_id_b, player_id_a}
       _ -> {false, nil, nil}
     end
   end

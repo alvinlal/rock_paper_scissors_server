@@ -2,6 +2,7 @@ defmodule RockPaperScissors.MatchMaker do
   use GenServer
   alias RockPaperScissors.Referee
   alias RockPaperScissorsWeb.Endpoint
+  alias RockPaperScissors.LobbyChannelEvents
   require Logger
 
   # Client API
@@ -37,7 +38,7 @@ defmodule RockPaperScissors.MatchMaker do
     case state do
       {nil, nil} ->
         Logger.info("broadcasting no_players to #{new_player_id}")
-        Endpoint.broadcast("lobby:player:" <> new_player_id, "no_players", %{})
+        Endpoint.broadcast("lobby:player:" <> new_player_id, LobbyChannelEvents.no_players(), %{})
         {:noreply, {new_player_session_id, new_player_game_id}}
 
       {^new_player_session_id, _} ->
@@ -55,13 +56,17 @@ defmodule RockPaperScissors.MatchMaker do
 
         GenServer.start(Referee, {game_channel_id})
 
-        Endpoint.broadcast("lobby:player:" <> new_player_id, "got_opponent", %{
+        Endpoint.broadcast("lobby:player:" <> new_player_id, LobbyChannelEvents.got_opponent(), %{
           game_channel_id: game_channel_id
         })
 
-        Endpoint.broadcast("lobby:player:" <> waiting_player_id, "got_opponent", %{
-          game_channel_id: game_channel_id
-        })
+        Endpoint.broadcast(
+          "lobby:player:" <> waiting_player_id,
+          LobbyChannelEvents.got_opponent(),
+          %{
+            game_channel_id: game_channel_id
+          }
+        )
 
         {:noreply, {nil, nil}}
 
